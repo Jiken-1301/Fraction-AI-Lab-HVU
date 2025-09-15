@@ -190,7 +190,7 @@ export default function Home() {
                       <span className="text-xl font-bold text-red-600">4</span>
                     </div>
                   </div>
-                  <h3 className="font-semibold text-gray-800">So sánh phân số</h3>
+                  <h3 className="font-semibold text-gray-800">Kế Hoạch Bài Dạy</h3>
                 </div>
               </Card>
 
