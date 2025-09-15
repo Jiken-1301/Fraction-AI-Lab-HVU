@@ -56,7 +56,6 @@ export default function HocLieuDetail({ params }: { params: { slug: string } }) 
       <Card className="p-6">
         <p className="text-muted-foreground mb-4">
           Đặt tập tin của bạn vào thư mục: <code className="bg-muted px-1 py-0.5 rounded">public{info.folder}</code>.
-          Các tập tin sẽ được phục vụ trực tiếp mà không cần đăng nhập.
         </p>
 
         {info.examples.length > 0 ? (
