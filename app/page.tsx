@@ -174,7 +174,7 @@ export default function Home() {
                   <div className="bg-blue-100 rounded-lg p-4">
                     <div className="text-2xl font-bold text-blue-800">3/4 → 2/4</div>
                   </div>
-                  <h3 className="font-semibold text-gray-800">Quy đổi phân số</h3>
+                  <h3 className="font-semibold text-gray-800">PPT Bài Giảng</h3>
                 </div>
               </Card>
 
@@ -213,7 +213,7 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  <h3 className="font-semibold text-gray-800">Giải ô chữ Toán</h3>
+                  <h3 className="font-semibold text-gray-800">Video Bài Giảng</h3>
                 </div>
               </Card>
 
@@ -234,7 +234,7 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  <h3 className="font-semibold text-gray-800">Ấp phình phân số</h3>
+                  <h3 className="font-semibold text-gray-800">Trò Chơi Học Tập</h3>
                 </div>
               </Card>
             </div>
