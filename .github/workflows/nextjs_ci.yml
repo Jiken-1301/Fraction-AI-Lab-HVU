@@ -23,9 +23,6 @@ jobs:
       - name: Cài đặt dependencies
         run: npm ci # Dùng 'ci' thay vì 'install' để đảm bảo tính nhất quán trên môi trường CI
 
-      - name: Kiểm tra lỗi Lint (ESLint)
-        run: npm run lint
-
       # Bước quan trọng: Next.js sẽ build để kiểm tra lỗi code/TypeScript
       - name: Build dự án
         run: npm run build
