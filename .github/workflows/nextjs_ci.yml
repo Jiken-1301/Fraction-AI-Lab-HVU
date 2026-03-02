@@ -29,6 +29,7 @@ jobs:
         env:
           # Nếu bạn có các biến môi trường (.env), hãy thêm ở đây
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
 
       - name: Thông báo kết quả
         if: success()
