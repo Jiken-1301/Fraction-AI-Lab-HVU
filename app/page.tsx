@@ -3,6 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 import { UserNav } from "@/components/user-nav"
 import {
   DropdownMenu,
@@ -12,6 +15,16 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export default function Home() {
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  const handleProtectedLink = (href: string) => {
+    if (!session) {
+      toast.error("Bạn phải đăng nhập mới có thể truy cập")
+      return
+    }
+    router.push(href)
+  }
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-transparent">
 
@@ -61,14 +74,11 @@ export default function Home() {
                     Học liệu
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="center" className="min-w-[14rem] z-[100] bg-white shadow-xl rounded-xl">
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href="/hoc-lieu/ke-hoach">Kế Hoạch Bài Dạy</Link>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => handleProtectedLink("/hoc-lieu/ke-hoach")}>
+                      Kế Hoạch Bài Dạy
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href="/hoc-lieu/phieu">Phiếu Bài Tập</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href="/hoc-lieu/ppt">Bài Giảng PPT</Link>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => handleProtectedLink("/hoc-lieu/ppt")}>
+                      Bài Giảng PPT
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
