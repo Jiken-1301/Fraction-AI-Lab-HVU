@@ -14,7 +14,7 @@ import {
 export default function Home() {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-transparent">
-      
+
       {/* Background mathematical symbols */}
       <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
         <div className="absolute top-20 left-10 text-6xl text-white">+</div>
@@ -28,14 +28,14 @@ export default function Home() {
 
       {/* Header */}
       <header className="relative z-50 w-full py-6 px-6">
-        
+
         {/* ĐƯA AVATAR VỀ LẠI GÓC PHẢI */}
         <div className="absolute right-6 top-1/2 -translate-y-1/2 z-[100]">
-           <UserNav />
+          <UserNav />
         </div>
 
         <nav className="max-w-7xl mx-auto w-full grid grid-cols-3 items-center h-12">
-          
+
           {/* CỘT 1 (Bên trái): Đã sửa Logo thành "AI - Fraction AI Lab" */}
           <div className="flex justify-start z-20">
             <Link href="/" className="flex items-center space-x-3 cursor-pointer whitespace-nowrap">
@@ -50,12 +50,12 @@ export default function Home() {
           <div className="hidden lg:flex justify-center z-10 w-full">
             <div className="relative">
               <div className="absolute -inset-x-4 -inset-y-4 border-4 border-red-500 rounded-full transform rotate-2 pointer-events-none opacity-80"></div>
-              
+
               <div className="flex items-center space-x-8 px-4 relative z-10 font-medium text-white">
                 <Link href="#" className="hover:text-purple-100 transition-colors cursor-pointer whitespace-nowrap">
                   Giới thiệu
                 </Link>
-                
+
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger className="text-white hover:text-purple-100 transition-colors outline-none cursor-pointer whitespace-nowrap">
                     Học liệu
@@ -168,40 +168,39 @@ export default function Home() {
           <Card className="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl border-none">
             <h2 className="text-3xl font-bold text-gray-800 mb-8">Kho học liệu</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-               <Card className="p-6 bg-blue-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
+              <Card className="p-6 bg-blue-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
                 <div className="text-center space-y-4">
-                  <div className="bg-blue-100 rounded-lg p-4"><div className="text-2xl font-bold text-blue-800">3/4 → 2/4</div></div>
-                  <h3 className="font-semibold text-gray-800">Quy đổi phân số</h3>
+                  <div className="bg-blue-100 rounded-lg p-4"><div className="text-2xl font-bold text-blue-800">6/4 → 3/2</div></div>
+                  <h3 className="font-semibold text-gray-800">Rút gọn phân số</h3>
                 </div>
               </Card>
-               <Card className="p-6 bg-red-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
+              <Card className="p-6 bg-red-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
                 <div className="text-center space-y-4">
                   <div className="bg-red-100 rounded-lg p-4 flex items-center justify-center space-x-2">
-                    <div className="w-12 h-12 border-2 border-red-400 rounded flex items-center justify-center">
-                      <span className="text-xl font-bold text-red-600">2</span>
+                    <div className="w-14 h-14 border-2 border-red-400 rounded flex items-center justify-center">
+                      <span className="text-xl font-bold text-red-600">1/3</span>
                     </div>
                     <span className="text-2xl font-bold text-gray-800">&lt;</span>
-                    <div className="w-12 h-12 border-2 border-red-400 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-red-600">4</span>
+                    <div className="w-14 h-14 border-2 border-red-400 rounded-full flex items-center justify-center">
+                      <span className="text-xl font-bold text-red-600">1/2</span>
                     </div>
                   </div>
                   <h3 className="font-semibold text-gray-800">So sánh phân số</h3>
                 </div>
               </Card>
-               <Card className="p-6 bg-yellow-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
+              <Card className="p-6 bg-yellow-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
                 <div className="text-center space-y-4">
                   <div className="bg-yellow-100 rounded-lg p-4">
                     <div className="grid grid-cols-5 gap-1">
                       {Array.from({ length: 25 }).map((_, i) => (
                         <div
                           key={i}
-                          className={`w-4 h-4 border border-gray-300 ${
-                            [0, 1, 2, 5, 6, 7, 10, 11, 12].includes(i)
-                              ? "bg-blue-200"
-                              : [3, 4, 8, 9, 13, 14].includes(i)
-                                ? "bg-yellow-200"
-                                : "bg-white"
-                          }`}
+                          className={`w-4 h-4 border border-gray-300 ${[0, 1, 2, 5, 6, 7, 10, 11, 12].includes(i)
+                            ? "bg-blue-200"
+                            : [3, 4, 8, 9, 13, 14].includes(i)
+                              ? "bg-yellow-200"
+                              : "bg-white"
+                            }`}
                         ></div>
                       ))}
                     </div>
@@ -209,23 +208,22 @@ export default function Home() {
                   <h3 className="font-semibold text-gray-800">Giải ô chữ Toán</h3>
                 </div>
               </Card>
-               <Card className="p-6 bg-blue-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
+              <Card className="p-6 bg-blue-50 border-0 rounded-2xl cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
                 <div className="text-center space-y-4">
                   <div className="bg-blue-100 rounded-lg p-4">
                     <div className="flex flex-wrap justify-center gap-1">
                       {["F", "R", "A", "C", "T", "I", "O", "N"].map((letter, i) => (
                         <div
                           key={i}
-                          className={`w-6 h-6 border border-gray-300 flex items-center justify-center text-xs font-bold ${
-                            i === 2 ? "bg-blue-400 text-white" : "bg-white text-gray-800"
-                          }`}
+                          className={`w-6 h-6 border border-gray-300 flex items-center justify-center text-xs font-bold ${i === 2 ? "bg-blue-400 text-white" : "bg-white text-gray-800"
+                            }`}
                         >
                           {letter}
                         </div>
                       ))}
                     </div>
                   </div>
-                  <h3 className="font-semibold text-gray-800">Ấp phình phân số</h3>
+                  <h3 className="font-semibold text-gray-800">Trò chơi học tập</h3>
                 </div>
               </Card>
             </div>
