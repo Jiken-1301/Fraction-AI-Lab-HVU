@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
         // 3. Lấy thông tin từ body (chỉ metadata nhỏ, không chứa file)
         const { fileName, mimeType, category } = await req.json();
 
+        // Lấy origin của client để Google Drive cho phép CORS
+        const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/$/, "") || "https://www.fractionailab.website";
+
         if (!fileName || !mimeType || !category) {
             return NextResponse.json({ error: "Thiếu thông tin file" }, { status: 400 });
         }
@@ -75,6 +78,7 @@ export async function POST(req: NextRequest) {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json; charset=UTF-8",
+                    "Origin": origin,
                 },
                 body: JSON.stringify({
                     name: fileName,
