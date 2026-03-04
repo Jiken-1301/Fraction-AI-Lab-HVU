@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Tăng timeout cho upload file lớn (60 giây)
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
