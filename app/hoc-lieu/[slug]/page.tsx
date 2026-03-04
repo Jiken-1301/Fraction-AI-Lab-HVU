@@ -1,53 +1,123 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { UploadDialog } from "@/components/upload-dialog";
+import { toast } from "sonner";
 
 const map: Record<
   string,
   {
     title: string;
-    folder: string;
     description?: string;
     icon: string;
     color: string;
-    examples: { label: string; file: string; driveId?: string }[]
+    acceptLabel: string;
+    acceptTypes: string;
+    examples: { label: string; file: string; driveId?: string }[];
   }
 > = {
   "ke-hoach": {
     title: "Kế Hoạch Bài Dạy",
-    folder: "/materials/ke-hoach",
-    description: "Tài liệu soạn giảng dành cho giáo viên tiểu học, có thể tải về hoặc xem trực tiếp.",
+    description:
+      "Tài liệu soạn giảng dành cho giáo viên tiểu học, có thể tải về hoặc xem trực tiếp.",
     icon: "📋",
     color: "purple",
+    acceptLabel: "PDF",
+    acceptTypes: ".pdf",
     examples: [
       {
         label: "Kế hoạch bài dạy.pdf",
         file: "https://drive.google.com/file/d/1SdaPUvGk6MdxrfU-Oc97fx17Oy9jiQFy/preview",
-        driveId: "1SdaPUvGk6MdxrfU-Oc97fx17Oy9jiQFy"
+        driveId: "1SdaPUvGk6MdxrfU-Oc97fx17Oy9jiQFy",
       },
     ],
   },
-  "ppt": {
+  ppt: {
     title: "Bài Giảng PPT",
-    folder: "/materials/ppt",
-    description: "Bài giảng PowerPoint sinh động, hỗ trợ giảng dạy trực quan trên lớp.",
+    description:
+      "Bài giảng PowerPoint sinh động, hỗ trợ giảng dạy trực quan trên lớp.",
     icon: "📊",
     color: "blue",
-    examples: [
-      { label: "Bai_giang_mau.pptx", file: "/materials/ppt/Bai_giang_mau.pptx" },
-    ],
+    acceptLabel: "PPT / PPTX",
+    acceptTypes: ".ppt,.pptx",
+    examples: [],
   },
 };
 
-export default function HocLieuDetail({ params }: { params: { slug: string } }) {
+interface UploadedDoc {
+  _id: string;
+  name: string;
+  driveId: string;
+  category: string;
+  mimeType: string;
+  createdAt: string;
+}
+
+export default function HocLieuDetail({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { data: session } = useSession() as { data: any };
+  const isAdmin = session?.user?.role === "admin";
+
   const info = map[params.slug] ?? {
     title: "Không tìm thấy",
-    folder: "/materials",
     description: "",
     icon: "❓",
     color: "gray",
+    acceptLabel: "",
+    acceptTypes: "",
     examples: [],
   };
+
+  const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([]);
+
+  const fetchDocs = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/documents?category=${params.slug}`);
+      const data = await res.json();
+      if (data.documents) {
+        setUploadedDocs(data.documents);
+      }
+    } catch {
+      // silent
+    }
+  }, [params.slug]);
+
+  useEffect(() => {
+    fetchDocs();
+  }, [fetchDocs]);
+
+  const handleUploadClick = () => {
+    if (!session?.user) {
+      toast.error("Bạn cần đăng nhập để sử dụng tính năng này");
+      return;
+    }
+    if (!isAdmin) {
+      toast.error("Bạn không có quyền tải tài liệu lên");
+    }
+    // nếu là admin, UploadDialog sẽ mở tự động
+  };
+
+  // Kết hợp danh sách hardcoded + uploaded
+  const allFiles = [
+    ...info.examples.map((ex) => ({
+      key: ex.file,
+      label: ex.label,
+      driveId: ex.driveId,
+      file: ex.file,
+    })),
+    ...uploadedDocs.map((doc) => ({
+      key: doc._id,
+      label: doc.name,
+      driveId: doc.driveId,
+      file: `https://drive.google.com/file/d/${doc.driveId}/preview`,
+    })),
+  ];
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -59,9 +129,23 @@ export default function HocLieuDetail({ params }: { params: { slug: string } }) 
             {info.title}
           </h1>
         </div>
-        <Button asChild className="bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
-          <Link href={info.folder}>📂 Mở thư mục</Link>
-        </Button>
+
+        {/* Upload button — admin thấy dialog, user thường thấy toast lỗi */}
+        {isAdmin ? (
+          <UploadDialog
+            category={params.slug}
+            acceptLabel={info.acceptLabel}
+            acceptTypes={info.acceptTypes}
+            onUploadSuccess={fetchDocs}
+          />
+        ) : (
+          <Button
+            onClick={handleUploadClick}
+            className="bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
+          >
+            📤 Upload tài liệu
+          </Button>
+        )}
       </div>
 
       {/* Description Card */}
@@ -71,15 +155,13 @@ export default function HocLieuDetail({ params }: { params: { slug: string } }) 
         </Card>
       )}
 
-
-
       {/* Files list */}
-      {info.examples.length > 0 ? (
+      {allFiles.length > 0 ? (
         <div className="space-y-6">
-          <h2 className="text-lg font-semibold text-gray-700">Tài liệu mẫu</h2>
-          {info.examples.map((ex) => (
+          <h2 className="text-lg font-semibold text-gray-700">Tài liệu</h2>
+          {allFiles.map((ex) => (
             <Card
-              key={ex.file}
+              key={ex.key}
               className="overflow-hidden rounded-2xl border-0 shadow-md hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between p-5 bg-white">
@@ -95,13 +177,35 @@ export default function HocLieuDetail({ params }: { params: { slug: string } }) 
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Button asChild variant="outline" className="rounded-xl border-purple-200 text-purple-600 hover:bg-purple-50">
-                    <a href={ex.driveId ? `https://drive.google.com/uc?export=download&id=${ex.driveId}` : ex.file} download>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="rounded-xl border-purple-200 text-purple-600 hover:bg-purple-50"
+                  >
+                    <a
+                      href={
+                        ex.driveId
+                          ? `https://drive.google.com/uc?export=download&id=${ex.driveId}`
+                          : ex.file
+                      }
+                      download
+                    >
                       ⬇️ Tải xuống
                     </a>
                   </Button>
-                  <Button asChild className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800">
-                    <a href={ex.driveId ? `https://drive.google.com/file/d/${ex.driveId}/view` : ex.file} target="_blank" rel="noreferrer">
+                  <Button
+                    asChild
+                    className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800"
+                  >
+                    <a
+                      href={
+                        ex.driveId
+                          ? `https://drive.google.com/file/d/${ex.driveId}/view`
+                          : ex.file
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       👁️ Xem
                     </a>
                   </Button>
@@ -124,7 +228,9 @@ export default function HocLieuDetail({ params }: { params: { slug: string } }) 
       ) : (
         <Card className="p-8 text-center rounded-2xl border-dashed border-2 border-gray-200">
           <div className="text-4xl mb-3">📭</div>
-          <p className="text-muted-foreground">Chưa có tệp mẫu. Hãy thêm vào thư mục tương ứng.</p>
+          <p className="text-muted-foreground">
+            Chưa có tài liệu nào. {isAdmin ? "Hãy upload tài liệu đầu tiên!" : ""}
+          </p>
         </Card>
       )}
     </div>
