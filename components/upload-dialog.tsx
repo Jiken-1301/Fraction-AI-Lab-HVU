@@ -75,10 +75,17 @@ export function UploadDialog({
 
             setProgress(80);
 
-            const data = await res.json();
+            let data;
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                data = await res.json();
+            }
 
             if (!res.ok) {
-                throw new Error(data.error || "Lỗi upload");
+                if (res.status === 413) {
+                    throw new Error("File quá lớn. Giới hạn tải lên là 50MB.");
+                }
+                throw new Error(data?.error || `Lỗi upload (${res.status})`);
             }
 
             setProgress(100);
