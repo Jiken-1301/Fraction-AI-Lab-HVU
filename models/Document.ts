@@ -13,7 +13,7 @@ const documentSchema = new Schema(
         category: {
             type: String,
             required: true,
-            enum: ["ke-hoach", "ppt"],
+            enum: ["ke-hoach", "ppt", "truyen-tranh"],
         },
         mimeType: {
             type: String,

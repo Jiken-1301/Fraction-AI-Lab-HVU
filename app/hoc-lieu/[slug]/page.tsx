@@ -45,6 +45,16 @@ const map: Record<
     acceptTypes: ".ppt,.pptx",
     examples: [],
   },
+  "truyen-tranh": {
+    title: "Truyện Tranh",
+    description:
+      "Truyện tranh minh họa sinh động, giúp học sinh tiếp cận kiến thức một cách thú vị và dễ hiểu.",
+    icon: "📚",
+    color: "pink",
+    acceptLabel: "PDF",
+    acceptTypes: ".pdf",
+    examples: [],
+  },
 };
 
 interface UploadedDoc {

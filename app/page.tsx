@@ -80,6 +80,9 @@ export default function Home() {
                     <DropdownMenuItem className="cursor-pointer" onClick={() => handleProtectedLink("/hoc-lieu/ppt")}>
                       Bài Giảng PPT
                     </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => handleProtectedLink("/hoc-lieu/truyen-tranh")}>
+                      Truyện Tranh
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 

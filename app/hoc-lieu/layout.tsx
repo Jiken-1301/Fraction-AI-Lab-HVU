@@ -35,6 +35,11 @@ export default function HocLieuLayout({ children }: { children: React.ReactNode 
                     <Link href="/hoc-lieu/ppt">📊 Bài Giảng PPT</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild className="hover:bg-purple-50 hover:text-purple-700 transition-colors">
+                    <Link href="/hoc-lieu/truyen-tranh">📚 Truyện Tranh</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

@@ -7,6 +7,7 @@ import Document from "@/models/Document";
 const FOLDER_MAP: Record<string, string | undefined> = {
     "ke-hoach": process.env.GOOGLE_DRIVE_FOLDER_ID_KE_HOACH,
     "ppt": process.env.GOOGLE_DRIVE_FOLDER_ID_PPT,
+    "truyen-tranh": process.env.GOOGLE_DRIVE_FOLDER_ID_TRUYEN_TRANH,
 };
 
 const ALLOWED_TYPES: Record<string, string[]> = {
@@ -15,6 +16,7 @@ const ALLOWED_TYPES: Record<string, string[]> = {
         "application/vnd.ms-powerpoint",
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ],
+    "truyen-tranh": ["application/pdf"],
 };
 
 export async function POST(req: NextRequest) {
@@ -62,7 +64,8 @@ export async function POST(req: NextRequest) {
         }
 
         if (!allowedTypes.includes(file.type)) {
-            const typeLabel = category === "ke-hoach" ? "PDF" : "PPT/PPTX";
+            const typeLabels: Record<string, string> = { "ke-hoach": "PDF", "ppt": "PPT/PPTX", "truyen-tranh": "PDF" };
+            const typeLabel = typeLabels[category] || "hợp lệ";
             return NextResponse.json(
                 { error: `Chỉ chấp nhận file ${typeLabel}` },
                 { status: 400 }
