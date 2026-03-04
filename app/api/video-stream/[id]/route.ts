@@ -11,10 +11,9 @@ let tokenExpirationTime = 0;
 const metaCache = new Map<string, { mimeType: string; size: number }>();
 
 // Lấy access token mới từ refresh token (không dùng googleapis vì Edge không hỗ trợ)
-async function getAccessToken(): Promise<string> {
+async function getAccessToken(forceRefresh = false): Promise<string> {
     const now = Date.now();
-    // Dùng lại token nếu token còn sống hơn 5 phút
-    if (cachedAccessToken && now < tokenExpirationTime - 5 * 60 * 1000) {
+    if (!forceRefresh && cachedAccessToken && now < tokenExpirationTime - 5 * 60 * 1000) {
         return cachedAccessToken;
     }
 
@@ -25,6 +24,7 @@ async function getAccessToken(): Promise<string> {
     const res = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        cache: "no-store", // TUYỆT ĐỐI KHÔNG CACHE TOKEN FETCH THEO NEXT.JS
         body: new URLSearchParams({
             client_id: clientId,
             client_secret: clientSecret,
@@ -35,11 +35,10 @@ async function getAccessToken(): Promise<string> {
 
     const data = await res.json();
     if (!data.access_token) {
-        throw new Error("Không thể lấy access token");
+        throw new Error("Không thể lấy access token mới");
     }
 
     cachedAccessToken = data.access_token;
-    // expires_in tính theo giây (ví dụ: 3599)
     tokenExpirationTime = now + (data.expires_in || 3600) * 1000;
 
     return cachedAccessToken;
@@ -58,7 +57,22 @@ export async function GET(
             });
         }
 
-        const accessToken = await getAccessToken();
+        let accessToken = await getAccessToken();
+
+        // Hàm helper request Google Drive có kèm theo tự động retry khi Token (401)
+        async function fetchDriveWithRetry(url: string, rangeHeaderValue?: string | null) {
+            let fetchHeaders: any = { Authorization: `Bearer ${accessToken}` };
+            if (rangeHeaderValue) fetchHeaders["Range"] = rangeHeaderValue;
+
+            let res = await fetch(url, { headers: fetchHeaders });
+            if (res.status === 401) {
+                console.log("Token expired, forcing refresh...");
+                accessToken = await getAccessToken(true);
+                fetchHeaders["Authorization"] = `Bearer ${accessToken}`;
+                res = await fetch(url, { headers: fetchHeaders });
+            }
+            return res;
+        }
 
         // 1. Phục hồi và Caching Metadata: Rất quan trọng để trả đúng Content-Type và Content-Length
         let mimeType = "video/mp4";
@@ -69,12 +83,7 @@ export async function GET(
             mimeType = cached.mimeType;
             fileSize = cached.size;
         } else {
-            const metaRes = await fetch(
-                `https://www.googleapis.com/drive/v3/files/${fileId}?fields=mimeType,size,name`,
-                {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }
-            );
+            const metaRes = await fetchDriveWithRetry(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=mimeType,size,name`);
 
             if (!metaRes.ok) {
                 const driveError = await metaRes.text();
@@ -93,21 +102,9 @@ export async function GET(
 
         // 2. Pass-through Range request chuẩn sang Google Drive để API tự handle byte ranges
         const rangeHeader = req.headers.get("range");
-        const fetchHeaders: Record<string, string> = {
-            Authorization: `Bearer ${accessToken}`,
-        };
-
-        if (rangeHeader) {
-            fetchHeaders["Range"] = rangeHeader;
-        }
 
         // Stream nội dung file từ Google Drive
-        const contentRes = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-            {
-                headers: fetchHeaders,
-            }
-        );
+        const contentRes = await fetchDriveWithRetry(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, rangeHeader);
 
         if (!contentRes.ok && contentRes.status !== 206 && contentRes.status !== 200) {
             console.error("Google Drive API Error:", await contentRes.text());
