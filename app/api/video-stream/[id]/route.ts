@@ -7,6 +7,9 @@ export const runtime = "edge";
 let cachedAccessToken = "";
 let tokenExpirationTime = 0;
 
+// Cache metadata để không tải dư thừa (Edge survival time: a few minutes usually)
+const metaCache = new Map<string, { mimeType: string; size: number }>();
+
 // Lấy access token mới từ refresh token (không dùng googleapis vì Edge không hỗ trợ)
 async function getAccessToken(): Promise<string> {
     const now = Date.now();
@@ -57,7 +60,37 @@ export async function GET(
 
         const accessToken = await getAccessToken();
 
-        // Pass-through Range request chuẩn sang Google Drive để API tự handle byte ranges
+        // 1. Phục hồi và Caching Metadata: Rất quan trọng để trả đúng Content-Type và Content-Length
+        let mimeType = "video/mp4";
+        let fileSize = 0;
+
+        if (metaCache.has(fileId)) {
+            const cached = metaCache.get(fileId)!;
+            mimeType = cached.mimeType;
+            fileSize = cached.size;
+        } else {
+            const metaRes = await fetch(
+                `https://www.googleapis.com/drive/v3/files/${fileId}?fields=mimeType,size,name`,
+                {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                }
+            );
+
+            if (!metaRes.ok) {
+                return new Response(JSON.stringify({ error: "File không tồn tại" }), {
+                    status: 404,
+                    headers: { "Content-Type": "application/json" },
+                });
+            }
+
+            const meta = await metaRes.json();
+            mimeType = meta.mimeType || "video/mp4";
+            fileSize = parseInt(meta.size || "0", 10);
+
+            metaCache.set(fileId, { mimeType, size: fileSize });
+        }
+
+        // 2. Pass-through Range request chuẩn sang Google Drive để API tự handle byte ranges
         const rangeHeader = req.headers.get("range");
         const fetchHeaders: Record<string, string> = {
             Authorization: `Bearer ${accessToken}`,
@@ -83,16 +116,23 @@ export async function GET(
             });
         }
 
-        // Lấy ra các HTTP headers quan trọng của video Google Drive trả về và truyền ngược lại client
+        // 3. Tái thiết lập Response Headers để đảm bảo trình duyệt video hoạt động mượt
         const responseHeaders = new Headers();
 
-        const copyHeaders = ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges"];
-        copyHeaders.forEach(h => {
-            const val = contentRes.headers.get(h);
-            if (val) responseHeaders.set(h, val);
-        });
+        // Bắt buộc khai báo Accept-Ranges và File Type chuẩn
+        responseHeaders.set("Content-Type", mimeType);
+        responseHeaders.set("Accept-Ranges", "bytes");
 
-        // Bỏ cache file ở trình duyệt Next.js proxy
+        // Trích xuất lại Content-Length và Content-Range chuẩn từ payload trả về
+        const driveContentLength = contentRes.headers.get("Content-Length");
+        const driveContentRange = contentRes.headers.get("Content-Range");
+
+        if (driveContentLength) responseHeaders.set("Content-Length", driveContentLength);
+        else if (!rangeHeader && fileSize > 0) responseHeaders.set("Content-Length", String(fileSize));
+
+        if (driveContentRange) responseHeaders.set("Content-Range", driveContentRange);
+
+        // Bỏ cache browser khi gọi proxy này
         responseHeaders.set("Cache-Control", "no-store, no-cache, must-revalidate");
 
         return new Response(contentRes.body, {
