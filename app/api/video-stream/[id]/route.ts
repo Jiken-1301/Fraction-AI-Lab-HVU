@@ -77,8 +77,9 @@ export async function GET(
             );
 
             if (!metaRes.ok) {
-                return new Response(JSON.stringify({ error: "File không tồn tại" }), {
-                    status: 404,
+                const driveError = await metaRes.text();
+                return new Response(JSON.stringify({ error: "File metadata fetch failed", details: driveError }), {
+                    status: metaRes.status,
                     headers: { "Content-Type": "application/json" },
                 });
             }
