@@ -96,8 +96,8 @@ export default function VideoPage() {
                         <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/20">
                             <UploadDialog
                                 category="video"
-                                acceptLabel="Video (MP4, MKV, WEBM)"
-                                acceptTypes=".mp4,.webm,.mkv,.mov"
+                                acceptLabel="Video (MP4)"
+                                acceptTypes=".mp4"
                                 onUploadSuccess={fetchDocs}
                             />
                         </div>
@@ -118,13 +118,13 @@ export default function VideoPage() {
 
             {/* Main Content */}
             <div className="max-w-5xl mx-auto px-6 mt-8">
-                {/* TIP: Hướng dẫn xử lý khi video quay lâu */}
-                <div className="mb-8 p-4 bg-orange-50 border border-orange-200 rounded-2xl flex items-start gap-3 shadow-sm">
-                    <span className="text-xl">💡</span>
+                {/* TIP */}
+                <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-2xl flex items-start gap-3 shadow-sm">
+                    <span className="text-xl">⚡</span>
                     <div>
-                        <p className="text-orange-800 font-bold text-sm">Mẹo nhỏ cho bạn:</p>
-                        <p className="text-orange-700 text-sm">
-                            Video mới tải lên có thể cần vài phút để Google xử lý. Nếu thấy biểu tượng <span className="font-bold underline italic">"quay tròn"</span> lâu, hãy bấm nút <b>"🎬 Xem toàn màn hình"</b> để xem ngay nhé!
+                        <p className="text-green-800 font-bold text-sm">Phát ngay tức thì!</p>
+                        <p className="text-green-700 text-sm">
+                            Video được phát trực tiếp từ trình duyệt, không cần chờ xử lý. Chỉ hỗ trợ định dạng <b>MP4</b>.
                         </p>
                     </div>
                 </div>
@@ -137,18 +137,14 @@ export default function VideoPage() {
                                 className="overflow-hidden rounded-2xl border-0 shadow-md hover:shadow-xl transition-all p-1 bg-white"
                             >
                                 <div className="flex flex-col md:flex-row items-stretch gap-4 p-4">
-                                    {/* Video Player */}
-                                    <div className="md:w-[400px] flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 relative group aspect-video">
-                                        <iframe
-                                            src={ex.file}
-                                            className="w-full h-full"
-                                            allow="autoplay; fullscreen"
-                                            title={ex.label}
+                                    {/* Video Player - Native HTML5 */}
+                                    <div className="md:w-[400px] flex-shrink-0 bg-black rounded-xl overflow-hidden border border-gray-800 relative aspect-video">
+                                        <video
+                                            src={`https://drive.google.com/uc?export=download&id=${ex.driveId}`}
+                                            controls
+                                            className="w-full h-full object-contain"
+                                            preload="metadata"
                                         />
-                                        <div className="absolute inset-0 bg-black/5 pointer-events-none group-hover:bg-transparent transition-colors"></div>
-                                        <div className="bg-gray-50 border-t border-gray-200 py-1.5 px-3 text-[10px] text-gray-500 italic text-center">
-                                            Nếu video quay lâu, vui lòng bấm nút "Xem toàn màn hình" bên cạnh
-                                        </div>
                                     </div>
 
                                     {/* Video Info */}
