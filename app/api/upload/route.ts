@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import { uploadToGoogleDrive } from "@/lib/google-drive";
 import Document from "@/models/Document";
@@ -8,6 +9,7 @@ const FOLDER_MAP: Record<string, string | undefined> = {
     "ke-hoach": process.env.GOOGLE_DRIVE_FOLDER_ID_KE_HOACH,
     "ppt": process.env.GOOGLE_DRIVE_FOLDER_ID_PPT,
     "truyen-tranh": process.env.GOOGLE_DRIVE_FOLDER_ID_TRUYEN_TRANH,
+    "video": process.env.GOOGLE_DRIVE_FOLDER_ID_VIDEO,
 };
 
 const ALLOWED_TYPES: Record<string, string[]> = {
@@ -17,12 +19,13 @@ const ALLOWED_TYPES: Record<string, string[]> = {
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ],
     "truyen-tranh": ["application/pdf"],
+    "video": ["video/mp4", "video/webm", "video/x-matroska", "video/quicktime"],
 };
 
 export async function POST(req: NextRequest) {
     try {
         // 1. Kiểm tra quyền admin
-        const session: any = await getServerSession();
+        const session: any = await getServerSession(authOptions);
         if (!session?.user) {
             return NextResponse.json(
                 { error: "Bạn chưa đăng nhập" },
@@ -64,7 +67,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (!allowedTypes.includes(file.type)) {
-            const typeLabels: Record<string, string> = { "ke-hoach": "PDF", "ppt": "PPT/PPTX", "truyen-tranh": "PDF" };
+            const typeLabels: Record<string, string> = { "ke-hoach": "PDF", "ppt": "PPT/PPTX", "truyen-tranh": "PDF", "video": "MP4/WEBM/MKV/MOV" };
             const typeLabel = typeLabels[category] || "hợp lệ";
             return NextResponse.json(
                 { error: `Chỉ chấp nhận file ${typeLabel}` },

@@ -6,7 +6,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
-import { UserNav } from "@/components/user-nav"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,11 +40,6 @@ export default function Home() {
 
       {/* Header */}
       <header className="relative z-50 w-full py-6 px-6">
-
-        {/* ĐƯA AVATAR VỀ LẠI GÓC PHẢI */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-[100]">
-          <UserNav />
-        </div>
 
         <nav className="max-w-7xl mx-auto w-full grid grid-cols-3 items-center h-12">
 
@@ -124,16 +118,18 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
+                  asChild
                   size="lg"
                   className="bg-white text-purple-600 hover:bg-purple-50 px-8 py-4 text-lg rounded-full cursor-pointer shadow-lg hover:scale-105 transition-transform"
                 >
-                  Khám phá học liệu
+                  <Link href="/hoc-lieu/ke-hoach">Khám phá học liệu</Link>
                 </Button>
                 <Button
+                  asChild
                   size="lg"
                   className="bg-orange-400 hover:bg-orange-500 text-white px-8 py-4 text-lg rounded-full cursor-pointer shadow-lg hover:scale-105 transition-transform"
                 >
-                  Bắt đầu học ngay
+                  <Link href="/video">Bắt đầu học ngay</Link>
                 </Button>
               </div>
             </div>

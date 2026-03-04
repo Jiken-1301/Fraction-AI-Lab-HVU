@@ -1,18 +1,26 @@
 import { google } from "googleapis";
+import { Readable } from "stream";
 
 function getAuth() {
-    const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-    const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY?.replace(/\\n/g, "\n");
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
 
-    if (!email || !key) {
-        throw new Error("Thiếu GOOGLE_SERVICE_ACCOUNT_EMAIL hoặc GOOGLE_SERVICE_ACCOUNT_KEY trong .env");
+    if (!clientId || !clientSecret || !refreshToken) {
+        throw new Error("Thiếu biến môi trường OAuth2 (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN) trong .env");
     }
 
-    return new google.auth.JWT({
-        email,
-        key,
-        scopes: ["https://www.googleapis.com/auth/drive.file"],
+    const oauth2Client = new google.auth.OAuth2(
+        clientId,
+        clientSecret,
+        "https://developers.google.com/oauthplayground"
+    );
+
+    oauth2Client.setCredentials({
+        refresh_token: refreshToken
     });
+
+    return oauth2Client;
 }
 
 export async function uploadToGoogleDrive(
@@ -24,10 +32,7 @@ export async function uploadToGoogleDrive(
     const auth = getAuth();
     const drive = google.drive({ version: "v3", auth });
 
-    const { Readable } = await import("stream");
-    const stream = new Readable();
-    stream.push(fileBuffer);
-    stream.push(null);
+    const stream = Readable.from(fileBuffer);
 
     const response = await drive.files.create({
         requestBody: {

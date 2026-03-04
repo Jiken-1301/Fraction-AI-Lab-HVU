@@ -6,6 +6,7 @@ import { Suspense } from "react"
 import ThemeSwitcher from "@/components/theme-switcher"
 import { AuthProvider } from "@/components/auth-provider" // Đảm bảo bạn đã tạo file này trong components/
 import { Toaster } from "@/components/ui/sonner" // Sử dụng component sonner bạn đã có
+import { UserNav } from "@/components/user-nav"
 import "./globals.css"
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -33,6 +34,9 @@ export default function RootLayout({
         <AuthProvider>
           <Suspense fallback={null}>
             <ThemeSwitcher>
+              <div className="fixed top-6 right-6 z-[9999]">
+                <UserNav />
+              </div>
               {children}
               <Toaster position="top-center" richColors />
             </ThemeSwitcher>
