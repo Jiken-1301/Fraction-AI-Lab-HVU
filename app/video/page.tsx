@@ -130,6 +130,7 @@ export default function VideoPage() {
                                     {/* Video Player - Native HTML5 */}
                                     <div className="md:w-[400px] flex-shrink-0 bg-black rounded-xl overflow-hidden border border-gray-800 relative aspect-video">
                                         <video
+                                            id={`video-${ex.driveId}`}
                                             src={`/api/video-stream/${ex.driveId}`}
                                             controls
                                             className="w-full h-full object-contain"
@@ -155,12 +156,15 @@ export default function VideoPage() {
 
                                         <div className="flex items-center gap-3 mt-6">
                                             <Button
-                                                asChild
                                                 className="rounded-xl flex-1 md:flex-none uppercase font-bold tracking-wide bg-gradient-to-r from-orange-400 to-rose-500 hover:from-orange-500 hover:to-rose-600 text-white shadow-md transition-transform hover:-translate-y-0.5"
+                                                onClick={() => {
+                                                    const video = document.getElementById(`video-${ex.driveId}`) as HTMLVideoElement;
+                                                    if (video) {
+                                                        video.requestFullscreen?.();
+                                                    }
+                                                }}
                                             >
-                                                <a href={ex.file.replace("/preview", "/view")} target="_blank" rel="noreferrer">
-                                                    🎬 Xem toàn màn hình
-                                                </a>
+                                                🎬 Xem toàn màn hình
                                             </Button>
                                             <Button
                                                 asChild
