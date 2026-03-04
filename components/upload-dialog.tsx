@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { uploadFileAction } from "@/lib/actions";
 
 interface UploadDialogProps {
     category: string;
@@ -60,26 +59,59 @@ export function UploadDialog({
     const handleUpload = async () => {
         if (!file) return;
         setUploading(true);
-        setProgress(10);
+        setProgress(5);
 
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("category", category);
+            // === Bước 1: Lấy resumable upload URL từ server ===
+            const urlRes = await fetch("/api/upload-url", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fileName: file.name,
+                    mimeType: file.type,
+                    category,
+                }),
+            });
 
-            setProgress(40);
-
-            // Sử dụng Server Action thay vì fetch để vượt giới hạn 4MB
-            const result = await uploadFileAction(formData);
-
-            setProgress(90);
-
-            if (!result) {
-                throw new Error("Không nhận được phản hồi từ máy chủ. Vui lòng thử lại.");
+            if (!urlRes.ok) {
+                const errData = await urlRes.json().catch(() => ({}));
+                throw new Error(errData.error || "Không thể khởi tạo upload");
             }
 
-            if (result.error) {
-                throw new Error(result.error);
+            const { uploadUrl } = await urlRes.json();
+            setProgress(20);
+
+            // === Bước 2: Upload file trực tiếp lên Google Drive (BYPASS Vercel) ===
+            const uploadRes = await fetch(uploadUrl, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": file.type || "application/octet-stream",
+                },
+                body: file, // Gửi file trực tiếp, không qua Vercel
+            });
+
+            if (!uploadRes.ok) {
+                throw new Error("Upload lên Google Drive thất bại");
+            }
+
+            const driveData = await uploadRes.json();
+            setProgress(70);
+
+            // === Bước 3: Lưu metadata vào MongoDB ===
+            const saveRes = await fetch("/api/save-document", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    driveId: driveData.id,
+                    fileName: file.name,
+                    mimeType: file.type,
+                    category,
+                }),
+            });
+
+            if (!saveRes.ok) {
+                const errData = await saveRes.json().catch(() => ({}));
+                throw new Error(errData.error || "Không thể lưu thông tin file");
             }
 
             setProgress(100);
