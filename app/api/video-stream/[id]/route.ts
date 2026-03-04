@@ -3,8 +3,18 @@ import { NextRequest } from "next/server";
 // ⚡ Dùng Edge Runtime để stream video không giới hạn kích thước
 export const runtime = "edge";
 
+// Cache token trên RAM của Edge server proxy, giúp tránh gọi API rate-limit Google OAuth
+let cachedAccessToken = "";
+let tokenExpirationTime = 0;
+
 // Lấy access token mới từ refresh token (không dùng googleapis vì Edge không hỗ trợ)
 async function getAccessToken(): Promise<string> {
+    const now = Date.now();
+    // Dùng lại token nếu token còn sống hơn 5 phút
+    if (cachedAccessToken && now < tokenExpirationTime - 5 * 60 * 1000) {
+        return cachedAccessToken;
+    }
+
     const clientId = process.env.GOOGLE_CLIENT_ID!;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET!;
     const refreshToken = process.env.GOOGLE_REFRESH_TOKEN!;
@@ -24,7 +34,12 @@ async function getAccessToken(): Promise<string> {
     if (!data.access_token) {
         throw new Error("Không thể lấy access token");
     }
-    return data.access_token;
+
+    cachedAccessToken = data.access_token;
+    // expires_in tính theo giây (ví dụ: 3599)
+    tokenExpirationTime = now + (data.expires_in || 3600) * 1000;
+
+    return cachedAccessToken;
 }
 
 export async function GET(
@@ -42,39 +57,14 @@ export async function GET(
 
         const accessToken = await getAccessToken();
 
-        // Lấy metadata (mimeType, size)
-        const metaRes = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${fileId}?fields=mimeType,size,name`,
-            {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            }
-        );
-
-        if (!metaRes.ok) {
-            return new Response(JSON.stringify({ error: "File không tồn tại" }), {
-                status: 404,
-                headers: { "Content-Type": "application/json" },
-            });
-        }
-
-        const meta = await metaRes.json();
-        const mimeType = meta.mimeType || "video/mp4";
-        const fileSize = parseInt(meta.size || "0", 10);
-
-        // Xử lý Range header (cho tua video)
+        // Pass-through Range request chuẩn sang Google Drive để API tự handle byte ranges
         const rangeHeader = req.headers.get("range");
         const fetchHeaders: Record<string, string> = {
             Authorization: `Bearer ${accessToken}`,
         };
 
-        let start = 0;
-        let end = fileSize - 1;
-
         if (rangeHeader) {
-            const parts = rangeHeader.replace(/bytes=/, "").split("-");
-            start = parseInt(parts[0], 10);
-            end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-            fetchHeaders["Range"] = `bytes=${start}-${end}`;
+            fetchHeaders["Range"] = rangeHeader;
         }
 
         // Stream nội dung file từ Google Drive
@@ -85,39 +75,36 @@ export async function GET(
             }
         );
 
-        if (!contentRes.ok && contentRes.status !== 206) {
-            return new Response(JSON.stringify({ error: "Không thể tải video" }), {
-                status: 500,
+        if (!contentRes.ok && contentRes.status !== 206 && contentRes.status !== 200) {
+            console.error("Google Drive API Error:", await contentRes.text());
+            return new Response(JSON.stringify({ error: "Không thể tải video từ lưu trữ" }), {
+                status: contentRes.status,
                 headers: { "Content-Type": "application/json" },
             });
         }
 
-        // Trả stream trực tiếp cho trình duyệt (không buffer toàn bộ)
-        const responseHeaders: Record<string, string> = {
-            "Content-Type": mimeType,
-            "Accept-Ranges": "bytes",
-            "Cache-Control": "no-store, no-cache, must-revalidate",
-        };
+        // Lấy ra các HTTP headers quan trọng của video Google Drive trả về và truyền ngược lại client
+        const responseHeaders = new Headers();
 
-        if (rangeHeader) {
-            responseHeaders["Content-Range"] = `bytes ${start}-${end}/${fileSize}`;
-            responseHeaders["Content-Length"] = String(end - start + 1);
-            return new Response(contentRes.body, {
-                status: 206,
-                headers: responseHeaders,
-            });
-        }
+        const copyHeaders = ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges"];
+        copyHeaders.forEach(h => {
+            const val = contentRes.headers.get(h);
+            if (val) responseHeaders.set(h, val);
+        });
 
-        responseHeaders["Content-Length"] = String(fileSize);
+        // Bỏ cache file ở trình duyệt Next.js proxy
+        responseHeaders.set("Cache-Control", "no-store, no-cache, must-revalidate");
+
         return new Response(contentRes.body, {
-            status: 200,
+            status: contentRes.status, // Giữ nguyên Code (200 OK hoặc 206 Partial Content)
             headers: responseHeaders,
         });
     } catch (error: any) {
-        console.error("Video stream error:", error.message);
-        return new Response(JSON.stringify({ error: "Không thể phát video" }), {
+        console.error("Video stream error:", error.message || error);
+        return new Response(JSON.stringify({ error: "Lỗi kết nối stream video" }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });
     }
 }
+
