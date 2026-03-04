@@ -118,16 +118,6 @@ export default function VideoPage() {
 
             {/* Main Content */}
             <div className="max-w-5xl mx-auto px-6 mt-8">
-                {/* TIP */}
-                <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-2xl flex items-start gap-3 shadow-sm">
-                    <span className="text-xl">⚡</span>
-                    <div>
-                        <p className="text-green-800 font-bold text-sm">Phát ngay tức thì!</p>
-                        <p className="text-green-700 text-sm">
-                            Video được phát trực tiếp từ trình duyệt, không cần chờ xử lý. Chỉ hỗ trợ định dạng <b>MP4</b>.
-                        </p>
-                    </div>
-                </div>
 
                 {allFiles.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6">
@@ -140,7 +130,7 @@ export default function VideoPage() {
                                     {/* Video Player - Native HTML5 */}
                                     <div className="md:w-[400px] flex-shrink-0 bg-black rounded-xl overflow-hidden border border-gray-800 relative aspect-video">
                                         <video
-                                            src={`https://drive.google.com/uc?export=download&id=${ex.driveId}`}
+                                            src={`/api/video-stream/${ex.driveId}`}
                                             controls
                                             className="w-full h-full object-contain"
                                             preload="metadata"
