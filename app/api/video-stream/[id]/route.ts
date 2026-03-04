@@ -96,7 +96,7 @@ export async function GET(
         const responseHeaders: Record<string, string> = {
             "Content-Type": mimeType,
             "Accept-Ranges": "bytes",
-            "Cache-Control": "public, max-age=3600",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
         };
 
         if (rangeHeader) {
