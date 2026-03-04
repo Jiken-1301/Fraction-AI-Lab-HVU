@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { uploadFileAction } from "@/lib/actions";
 
 interface UploadDialogProps {
     category: string;
@@ -66,26 +67,15 @@ export function UploadDialog({
             formData.append("file", file);
             formData.append("category", category);
 
-            setProgress(30);
+            setProgress(40);
 
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
+            // Sử dụng Server Action thay vì fetch để vượt giới hạn 4MB
+            const result = await uploadFileAction(formData);
 
-            setProgress(80);
+            setProgress(90);
 
-            let data;
-            const contentType = res.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-                data = await res.json();
-            }
-
-            if (!res.ok) {
-                if (res.status === 413) {
-                    throw new Error("File quá lớn. Giới hạn tải lên là 50MB.");
-                }
-                throw new Error(data?.error || `Lỗi upload (${res.status})`);
+            if (result.error) {
+                throw new Error(result.error);
             }
 
             setProgress(100);

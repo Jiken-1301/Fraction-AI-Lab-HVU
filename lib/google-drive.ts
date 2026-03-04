@@ -61,3 +61,24 @@ export async function uploadToGoogleDrive(
         webViewLink: response.data.webViewLink!,
     };
 }
+
+export async function checkFileExists(driveId: string): Promise<boolean> {
+    try {
+        const auth = getAuth();
+        const drive = google.drive({ version: "v3", auth });
+
+        await drive.files.get({
+            fileId: driveId,
+            fields: "id",
+        });
+
+        return true;
+    } catch (error: any) {
+        // Nếu lỗi 404 là file không tồn tại
+        if (error.code === 404) return false;
+
+        // Các lỗi khác (quyền truy cập, v.v.) tạm thời coi là không tồn tại để dọn dẹp DB
+        console.error(`Error checking file ${driveId}:`, error.message);
+        return false;
+    }
+}
