@@ -74,6 +74,10 @@ export function UploadDialog({
 
             setProgress(90);
 
+            if (!result) {
+                throw new Error("Không nhận được phản hồi từ máy chủ. Vui lòng thử lại.");
+            }
+
             if (result.error) {
                 throw new Error(result.error);
             }

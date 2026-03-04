@@ -118,6 +118,17 @@ export default function VideoPage() {
 
             {/* Main Content */}
             <div className="max-w-5xl mx-auto px-6 mt-8">
+                {/* TIP: Hướng dẫn xử lý khi video quay lâu */}
+                <div className="mb-8 p-4 bg-orange-50 border border-orange-200 rounded-2xl flex items-start gap-3 shadow-sm">
+                    <span className="text-xl">💡</span>
+                    <div>
+                        <p className="text-orange-800 font-bold text-sm">Mẹo nhỏ cho bạn:</p>
+                        <p className="text-orange-700 text-sm">
+                            Video mới tải lên có thể cần vài phút để Google xử lý. Nếu thấy biểu tượng <span className="font-bold underline italic">"quay tròn"</span> lâu, hãy bấm nút <b>"🎬 Xem toàn màn hình"</b> để xem ngay nhé!
+                        </p>
+                    </div>
+                </div>
+
                 {allFiles.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6">
                         {allFiles.map((ex) => (
@@ -127,20 +138,24 @@ export default function VideoPage() {
                             >
                                 <div className="flex flex-col md:flex-row items-stretch gap-4 p-4">
                                     {/* Video Player */}
-                                    <div className="md:w-[400px] flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                                    <div className="md:w-[400px] flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 relative group aspect-video">
                                         <iframe
                                             src={ex.file}
-                                            className="w-full h-[225px]"
+                                            className="w-full h-full"
                                             allow="autoplay; fullscreen"
                                             title={ex.label}
                                         />
+                                        <div className="absolute inset-0 bg-black/5 pointer-events-none group-hover:bg-transparent transition-colors"></div>
+                                        <div className="bg-gray-50 border-t border-gray-200 py-1.5 px-3 text-[10px] text-gray-500 italic text-center">
+                                            Nếu video quay lâu, vui lòng bấm nút "Xem toàn màn hình" bên cạnh
+                                        </div>
                                     </div>
 
                                     {/* Video Info */}
                                     <div className="flex flex-col flex-1 justify-between py-2">
                                         <div>
-                                            <div className="flex" title={ex.label}>
-                                                <h3 className="text-xl font-bold text-gray-800 line-clamp-2 leading-tight">
+                                            <div className="flex justify-between items-start gap-4">
+                                                <h3 className="text-xl font-bold text-gray-800 line-clamp-2 leading-tight flex-1" title={ex.label}>
                                                     {ex.label}
                                                 </h3>
                                             </div>
@@ -192,7 +207,7 @@ export default function VideoPage() {
                 }
             </div >
 
-            {/* Back to Home Link (Bottom Left) - Shrinked as requested */}
+            {/* Back to Home Link (Bottom Left) */}
             <div className="fixed bottom-6 left-6 z-[9999]">
                 <Link
                     href="/"

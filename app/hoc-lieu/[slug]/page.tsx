@@ -16,7 +16,6 @@ const map: Record<
     color: string;
     acceptLabel: string;
     acceptTypes: string;
-    examples: { label: string; file: string; driveId?: string }[];
   }
 > = {
   "ke-hoach": {
@@ -27,13 +26,6 @@ const map: Record<
     color: "purple",
     acceptLabel: "PDF",
     acceptTypes: ".pdf",
-    examples: [
-      {
-        label: "Kế hoạch bài dạy.pdf",
-        file: "https://drive.google.com/file/d/1SdaPUvGk6MdxrfU-Oc97fx17Oy9jiQFy/preview",
-        driveId: "1SdaPUvGk6MdxrfU-Oc97fx17Oy9jiQFy",
-      },
-    ],
   },
   ppt: {
     title: "Bài Giảng PPT",
@@ -43,7 +35,6 @@ const map: Record<
     color: "blue",
     acceptLabel: "PPT / PPTX",
     acceptTypes: ".ppt,.pptx",
-    examples: [],
   },
   "truyen-tranh": {
     title: "Truyện Tranh",
@@ -53,7 +44,6 @@ const map: Record<
     color: "pink",
     acceptLabel: "PDF",
     acceptTypes: ".pdf",
-    examples: [],
   },
 };
 
@@ -81,7 +71,6 @@ export default function HocLieuDetail({
     color: "gray",
     acceptLabel: "",
     acceptTypes: "",
-    examples: [],
   };
 
   const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([]);
@@ -113,21 +102,13 @@ export default function HocLieuDetail({
     // nếu là admin, UploadDialog sẽ mở tự động
   };
 
-  // Kết hợp danh sách hardcoded + uploaded
-  const allFiles = [
-    ...info.examples.map((ex) => ({
-      key: ex.file,
-      label: ex.label,
-      driveId: ex.driveId,
-      file: ex.file,
-    })),
-    ...uploadedDocs.map((doc) => ({
-      key: doc._id,
-      label: doc.name,
-      driveId: doc.driveId,
-      file: `https://drive.google.com/file/d/${doc.driveId}/preview`,
-    })),
-  ];
+  // Danh sách file từ MongoDB (đã được API verify với Drive)
+  const allFiles = uploadedDocs.map((doc) => ({
+    key: doc._id,
+    label: doc.name,
+    driveId: doc.driveId,
+    file: `https://drive.google.com/file/d/${doc.driveId}/preview`,
+  }));
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
