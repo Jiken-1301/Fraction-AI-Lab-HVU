@@ -118,18 +118,18 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-                  asChild
                   size="lg"
                   className="bg-white text-purple-600 hover:bg-purple-50 px-8 py-4 text-lg rounded-full cursor-pointer shadow-lg hover:scale-105 transition-transform"
+                  onClick={() => handleProtectedLink("/hoc-lieu/ke-hoach")}
                 >
-                  <Link href="/hoc-lieu/ke-hoach">Khám phá học liệu</Link>
+                  Khám phá học liệu
                 </Button>
                 <Button
-                  asChild
                   size="lg"
                   className="bg-orange-400 hover:bg-orange-500 text-white px-8 py-4 text-lg rounded-full cursor-pointer shadow-lg hover:scale-105 transition-transform"
+                  onClick={() => handleProtectedLink("/video")}
                 >
-                  <Link href="/video">Bắt đầu học ngay</Link>
+                  Bắt đầu học ngay
                 </Button>
               </div>
             </div>
