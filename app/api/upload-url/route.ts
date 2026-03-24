@@ -83,9 +83,6 @@ export async function POST(req: NextRequest) {
                 body: JSON.stringify({
                     name: fileName,
                     parents: [folderId],
-                    // Ép Google Drive tự động chuyển đổi file PPT/PPTX thành định dạng Google Slides
-                    // Điều này giúp nhúng file (embed) ở chế độ trình chiếu (presentation) siêu mượt
-                    ...(category === "tro-choi" && { mimeType: "application/vnd.google-apps.presentation" })
                 }),
             }
         );

@@ -70,9 +70,10 @@ export default function TroChoiDetailPage() {
         );
     }
 
-    // Mở file PPTX bằng Google Slides ở chế độ trình chiếu (presentation mode)
-    // Code mới sẽ tự động convert file PPTX thành Google Slides lúc upload, nên URL này sẽ hoạt động mượt mà
-    const presentationUrl = `https://docs.google.com/presentation/d/${game.driveId}/preview?rm=minimal`;
+    // Dùng Microsoft Office Viewer kết hợp với API Stream của Vercel Production
+    // Để bypass lỗi Google Drive file > 25MB bị chặn virus quét, Microsoft sẽ gọi tới Vercel API để tải HTTPS RAW file.
+    const directUrl = encodeURIComponent(`https://www.fractionailab.website/api/video-stream/${game.driveId}?filename=game.pptx`);
+    const presentationUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${directUrl}`;
 
     return (
         <div className="min-h-screen flex flex-col">
