@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Thiếu thông tin" }, { status: 400 });
         }
 
-        // 4. Đặt quyền xem công khai cho file trên Drive
+        // 4. Đặt quyền xem công khai cho file trên Drive + lấy thumbnail
+        let thumbnailLink = null;
         try {
             const clientId = process.env.GOOGLE_CLIENT_ID;
             const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -53,6 +54,19 @@ export async function POST(req: NextRequest) {
                     type: "anyone",
                 },
             });
+
+            // Lấy thumbnailLink cho trò chơi PPT
+            if (category === "tro-choi") {
+                try {
+                    const fileInfo = await drive.files.get({
+                        fileId: driveId,
+                        fields: "thumbnailLink",
+                    });
+                    thumbnailLink = fileInfo.data.thumbnailLink || null;
+                } catch (thumbErr: any) {
+                    console.error("Thumbnail fetch error:", thumbErr.message);
+                }
+            }
         } catch (permError: any) {
             console.error("Permission error:", permError.message);
             // Không throw, vẫn lưu metadata dù set permission lỗi
@@ -65,6 +79,7 @@ export async function POST(req: NextRequest) {
             category,
             mimeType: mimeType || "application/octet-stream",
             uploadedBy: session.user.email,
+            ...(thumbnailLink && { thumbnailLink }),
         });
 
         return NextResponse.json({

@@ -83,9 +83,9 @@ export default function Home() {
                 <div onClick={() => handleProtectedLink("/video")} className="hover:text-purple-100 transition-colors cursor-pointer whitespace-nowrap">
                   Video
                 </div>
-                <Link href="#" className="hover:text-purple-100 transition-colors cursor-pointer whitespace-nowrap">
+                <div onClick={() => handleProtectedLink("/tro-choi")} className="hover:text-purple-100 transition-colors cursor-pointer whitespace-nowrap">
                   Trò chơi
-                </Link>
+                </div>
                 <Link href="#" className="hover:text-purple-100 transition-colors cursor-pointer whitespace-nowrap">
                   Liên hệ
                 </Link>

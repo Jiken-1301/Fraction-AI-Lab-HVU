@@ -13,11 +13,15 @@ const documentSchema = new Schema(
         category: {
             type: String,
             required: true,
-            enum: ["ke-hoach", "ppt", "truyen-tranh", "video"],
+            enum: ["ke-hoach", "ppt", "truyen-tranh", "video", "tro-choi"],
         },
         mimeType: {
             type: String,
             required: true,
+        },
+        thumbnailLink: {
+            type: String,
+            default: null,
         },
         uploadedBy: {
             type: String,
