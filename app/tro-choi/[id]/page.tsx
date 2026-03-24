@@ -70,10 +70,9 @@ export default function TroChoiDetailPage() {
         );
     }
 
-    // Google Drive embed URL cho PPT (sử dụng Google Docs viewer)
-    const embedUrl = `https://docs.google.com/gview?url=https://drive.google.com/uc?id=${game.driveId}&embedded=true`;
-    // Hoặc dùng Google Drive preview trực tiếp
-    const drivePreviewUrl = `https://drive.google.com/file/d/${game.driveId}/preview`;
+    // Mở file PPTX bằng Google Slides ở chế độ trình chiếu (presentation mode)
+    // Code mới sẽ tự động convert file PPTX thành Google Slides lúc upload, nên URL này sẽ hoạt động mượt mà
+    const presentationUrl = `https://docs.google.com/presentation/d/${game.driveId}/preview?rm=minimal`;
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -102,11 +101,11 @@ export default function TroChoiDetailPage() {
             </div>
 
             {/* PPT Embed - Full height */}
-            <div className="flex-1 bg-gray-100">
+            <div className="flex-1 bg-black">
                 <iframe
-                    src={drivePreviewUrl}
+                    src={presentationUrl}
                     className="w-full h-[calc(100vh-73px)] border-0"
-                    allow="autoplay"
+                    allow="autoplay; fullscreen"
                     allowFullScreen
                 />
             </div>
