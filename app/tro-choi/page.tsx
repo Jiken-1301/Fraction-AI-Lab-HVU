@@ -131,19 +131,21 @@ export default function TroChoiPage() {
                                 <Card className="group overflow-hidden rounded-2xl border-0 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer bg-white">
                                     {/* Thumbnail */}
                                     <div className="aspect-video bg-gradient-to-br from-emerald-100 to-teal-50 relative overflow-hidden">
-                                        {game.thumbnailLink ? (
-                                            <img
-                                                src={game.thumbnailLink}
-                                                alt={getGameName(game.name)}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                onError={(e) => {
-                                                    // Fallback nếu thumbnail lỗi
-                                                    (e.target as HTMLImageElement).style.display = 'none';
-                                                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                                                }}
-                                            />
-                                        ) : null}
-                                        <div className={`absolute inset-0 flex flex-col items-center justify-center ${game.thumbnailLink ? 'hidden' : ''}`}>
+                                        {(() => {
+                                            const thumbUrl = game.thumbnailLink || `https://drive.google.com/thumbnail?id=${game.driveId}&sz=w800`;
+                                            return (
+                                                <img
+                                                    src={thumbUrl}
+                                                    alt={getGameName(game.name)}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                        (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                                    }}
+                                                />
+                                            );
+                                        })()}
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center hidden">
                                             <div className="w-20 h-20 bg-white/80 rounded-2xl flex items-center justify-center shadow-lg mb-3">
                                                 <span className="text-4xl">🎮</span>
                                             </div>

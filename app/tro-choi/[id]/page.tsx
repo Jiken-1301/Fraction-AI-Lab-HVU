@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 interface GameDoc {
@@ -62,10 +61,10 @@ export default function TroChoiDetailPage() {
                 <div className="text-6xl">😔</div>
                 <h2 className="text-2xl font-bold text-gray-800">Không tìm thấy trò chơi</h2>
                 <p className="text-gray-500">Trò chơi này có thể đã bị xóa hoặc không tồn tại.</p>
-                <Link href="/tro-choi">
-                    <Button className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 mt-4">
-                        ← Quay lại danh sách
-                    </Button>
+                <Link href="/" className="mt-4">
+                    <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer">
+                        <span className="font-bold text-xl text-rose-600">AI</span>
+                    </div>
                 </Link>
             </div>
         );
@@ -85,49 +84,20 @@ export default function TroChoiDetailPage() {
                     background: `linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), linear-gradient(to right, var(--theme-banner-from), var(--theme-banner-to))`
                 }}
             >
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/tro-choi">
-                            <Button
-                                variant="ghost"
-                                className="text-white hover:bg-white/20 rounded-xl gap-2 font-bold"
-                            >
-                                <span className="text-lg">←</span> Quay lại
-                            </Button>
-                        </Link>
-                        <div className="h-6 w-px bg-white/30"></div>
-                        <h1 className="text-white font-bold text-lg md:text-xl truncate max-w-[500px] flex items-center gap-2">
-                            <span>🎮</span>
-                            {getGameName(game.name)}
-                        </h1>
-                    </div>
+                {/* Logo (Top Left Corner) */}
+                <div className="absolute top-1/2 -translate-y-1/2 left-6 z-[9999]">
+                    <Link href="/" className="cursor-pointer opacity-90 hover:opacity-100 transition-opacity">
+                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md border border-white/20">
+                            <span className="font-bold text-sm text-rose-600">AI</span>
+                        </div>
+                    </Link>
+                </div>
 
-                    <div className="flex items-center gap-3">
-                        <Button
-                            asChild
-                            variant="outline"
-                            className="rounded-xl border-white/30 text-white hover:bg-white/20 hover:text-white bg-transparent"
-                        >
-                            <a
-                                href={`https://drive.google.com/uc?export=download&id=${game.driveId}`}
-                                download
-                            >
-                                ⬇️ Tải về
-                            </a>
-                        </Button>
-                        <Button
-                            asChild
-                            className="rounded-xl bg-white text-emerald-600 hover:bg-emerald-50 font-bold"
-                        >
-                            <a
-                                href={`https://drive.google.com/file/d/${game.driveId}/view`}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                🔗 Mở trên Drive
-                            </a>
-                        </Button>
-                    </div>
+                <div className="max-w-7xl mx-auto flex items-center justify-center h-10">
+                    <h1 className="text-white font-bold text-lg md:text-xl truncate max-w-[500px] flex items-center gap-2">
+                        <span>🎮</span>
+                        {getGameName(game.name)}
+                    </h1>
                 </div>
             </div>
 

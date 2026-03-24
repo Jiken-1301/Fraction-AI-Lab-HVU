@@ -55,17 +55,9 @@ export async function POST(req: NextRequest) {
                 },
             });
 
-            // Lấy thumbnailLink cho trò chơi PPT
+            // Tạo thumbnail link công khai cho trò chơi PPT
             if (category === "tro-choi") {
-                try {
-                    const fileInfo = await drive.files.get({
-                        fileId: driveId,
-                        fields: "thumbnailLink",
-                    });
-                    thumbnailLink = fileInfo.data.thumbnailLink || null;
-                } catch (thumbErr: any) {
-                    console.error("Thumbnail fetch error:", thumbErr.message);
-                }
+                thumbnailLink = `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`;
             }
         } catch (permError: any) {
             console.error("Permission error:", permError.message);
