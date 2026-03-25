@@ -130,8 +130,13 @@ export async function GET(
 
         if (driveContentRange) responseHeaders.set("Content-Range", driveContentRange);
 
-        // Bỏ cache browser khi gọi proxy này
-        responseHeaders.set("Cache-Control", "no-store, no-cache, must-revalidate");
+        // Cache PPT files (game files) lâu hơn vì ít thay đổi, video thì không cache
+        const isPPT = mimeType.includes("presentation") || mimeType.includes("powerpoint") || mimeType.includes("ms-powerpoint");
+        if (isPPT) {
+            responseHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+        } else {
+            responseHeaders.set("Cache-Control", "no-store, no-cache, must-revalidate");
+        }
 
         return new Response(contentRes.body, {
             status: contentRes.status, // Giữ nguyên Code (200 OK hoặc 206 Partial Content)
