@@ -27,15 +27,7 @@ const map: Record<
     acceptLabel: "PDF",
     acceptTypes: ".pdf",
   },
-  ppt: {
-    title: "Bài Giảng PPT",
-    description:
-      "Bài giảng PowerPoint sinh động, hỗ trợ giảng dạy trực quan trên lớp.",
-    icon: "📊",
-    color: "blue",
-    acceptLabel: "PPT / PPTX",
-    acceptTypes: ".ppt,.pptx",
-  },
+
   "truyen-tranh": {
     title: "Truyện Tranh",
     description:
