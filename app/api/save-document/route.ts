@@ -32,8 +32,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Thiếu thông tin" }, { status: 400 });
         }
 
-        // 4. Đặt quyền xem công khai cho file trên Drive + lấy thumbnail
+        // 4. Đặt quyền xem công khai cho file trên Drive + lấy thumbnail + convert Google Slides
         let thumbnailLink = null;
+        let googleSlidesId: string | null = null;
         try {
             const clientId = process.env.GOOGLE_CLIENT_ID;
             const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -58,6 +59,34 @@ export async function POST(req: NextRequest) {
             // Tạo thumbnail link công khai cho trò chơi PPT
             if (category === "tro-choi") {
                 thumbnailLink = `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`;
+
+                // Convert PPTX → Google Slides để giữ animation khi embed
+                try {
+                    const folderId = process.env[`GOOGLE_DRIVE_FOLDER_ID_${category.toUpperCase().replace(/-/g, "_")}`];
+                    const copied = await drive.files.copy({
+                        fileId: driveId,
+                        requestBody: {
+                            name: fileName.replace(/\.pptx?$/i, '') + ' (Slides)',
+                            mimeType: 'application/vnd.google-apps.presentation',
+                            ...(folderId && { parents: [folderId] }),
+                        },
+                    });
+                    googleSlidesId = copied.data.id || null;
+
+                    // Set public cho bản Google Slides
+                    if (googleSlidesId) {
+                        await drive.permissions.create({
+                            fileId: googleSlidesId,
+                            requestBody: {
+                                role: "reader",
+                                type: "anyone",
+                            },
+                        });
+                    }
+                } catch (convertError: any) {
+                    console.error("Google Slides conversion error:", convertError.message);
+                    // Không throw — vẫn lưu document dù convert lỗi
+                }
             }
         } catch (permError: any) {
             console.error("Permission error:", permError.message);
@@ -72,6 +101,7 @@ export async function POST(req: NextRequest) {
             mimeType: mimeType || "application/octet-stream",
             uploadedBy: session.user.email,
             ...(thumbnailLink && { thumbnailLink }),
+            ...(googleSlidesId && { googleSlidesId }),
         });
 
         return NextResponse.json({

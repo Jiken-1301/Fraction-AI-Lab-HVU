@@ -23,6 +23,10 @@ const documentSchema = new Schema(
             type: String,
             default: null,
         },
+        googleSlidesId: {
+            type: String,
+            default: null,
+        },
         uploadedBy: {
             type: String,
             required: true,

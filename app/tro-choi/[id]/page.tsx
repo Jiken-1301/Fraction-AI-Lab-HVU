@@ -11,6 +11,7 @@ interface GameDoc {
     category: string;
     mimeType: string;
     thumbnailLink?: string;
+    googleSlidesId?: string;
 }
 
 export default function TroChoiDetailPage() {
@@ -92,10 +93,10 @@ export default function TroChoiDetailPage() {
         );
     }
 
-    // Detect đúng extension từ tên file gốc (.ppt hoặc .pptx)
-    const ext = game.name.match(/\.(pptx?)$/i)?.[1]?.toLowerCase() || 'pptx';
-    const directUrl = encodeURIComponent(`https://www.fractionailab.website/api/video-stream/${game.driveId}?filename=game.${ext}`);
-    const presentationUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${directUrl}&wdAr=1.7777777777777777`;
+    // Ưu tiên Google Slides viewer (giữ animation + tương tác), fallback Office Online
+    const presentationUrl = game.googleSlidesId
+        ? `https://docs.google.com/presentation/d/${game.googleSlidesId}/embed?start=false&loop=false&delayms=60000`
+        : `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${game.driveId}`)}&wdAr=1.7777777777777777`;
 
     return (
         <div className="h-screen flex flex-col overflow-hidden bg-black">
