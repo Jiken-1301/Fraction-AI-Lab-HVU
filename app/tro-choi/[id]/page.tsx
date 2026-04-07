@@ -93,10 +93,8 @@ export default function TroChoiDetailPage() {
         );
     }
 
-    // Ưu tiên Google Slides viewer (giữ animation + tương tác), fallback Office Online
-    const presentationUrl = game.googleSlidesId
-        ? `https://docs.google.com/presentation/d/${game.googleSlidesId}/embed?start=false&loop=false&delayms=60000`
-        : `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${game.driveId}`)}&wdAr=1.7777777777777777`;
+    // Dùng Office Online viewer với direct Drive URL (nhanh, giữ đúng layout)
+    const presentationUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${game.driveId}`)}&wdAr=1.7777777777777777`;
 
     return (
         <div className="h-screen flex flex-col overflow-hidden bg-black">
