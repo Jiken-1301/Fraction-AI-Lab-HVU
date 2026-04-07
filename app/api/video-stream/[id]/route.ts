@@ -130,6 +130,13 @@ export async function GET(
 
         if (driveContentRange) responseHeaders.set("Content-Range", driveContentRange);
 
+        // Truyền filename từ query param cho Office Online viewer nhận ra đúng định dạng
+        const url = new URL(req.url);
+        const filename = url.searchParams.get('filename');
+        if (filename) {
+            responseHeaders.set("Content-Disposition", `inline; filename="${filename}"`);
+        }
+
         // Cache PPT files (game files) lâu hơn vì ít thay đổi, video thì không cache
         const isPPT = mimeType.includes("presentation") || mimeType.includes("powerpoint") || mimeType.includes("ms-powerpoint");
         if (isPPT) {

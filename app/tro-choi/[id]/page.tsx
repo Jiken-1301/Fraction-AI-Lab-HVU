@@ -92,8 +92,9 @@ export default function TroChoiDetailPage() {
         );
     }
 
-    // Sử dụng action=embedview để ẩn toolbar PPT và logo
-    const directUrl = encodeURIComponent(`https://www.fractionailab.website/api/video-stream/${game.driveId}?filename=game.pptx`);
+    // Detect đúng extension từ tên file gốc (.ppt hoặc .pptx)
+    const ext = game.name.match(/\.(pptx?)$/i)?.[1]?.toLowerCase() || 'pptx';
+    const directUrl = encodeURIComponent(`https://www.fractionailab.website/api/video-stream/${game.driveId}?filename=game.${ext}`);
     const presentationUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${directUrl}&wdAr=1.7777777777777777`;
 
     return (
