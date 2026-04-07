@@ -93,8 +93,10 @@ export default function TroChoiDetailPage() {
         );
     }
 
-    // Dùng Google Drive preview (file đã public, nhanh, đáng tin cậy)
-    const presentationUrl = `https://drive.google.com/file/d/${game.driveId}/preview`;
+    // Office Online viewer qua Vercel proxy (có tương tác, giữ animation, layout đúng)
+    const ext = game.name.match(/\.(pptx?)$/i)?.[1]?.toLowerCase() || 'pptx';
+    const directUrl = encodeURIComponent(`https://www.fractionailab.website/api/video-stream/${game.driveId}?filename=game.${ext}`);
+    const presentationUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${directUrl}&wdAr=1.7777777777777777`;
 
     return (
         <div className="h-screen flex flex-col overflow-hidden bg-black">

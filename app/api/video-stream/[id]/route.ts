@@ -140,7 +140,7 @@ export async function GET(
         // Cache PPT files (game files) lâu hơn vì ít thay đổi, video thì không cache
         const isPPT = mimeType.includes("presentation") || mimeType.includes("powerpoint") || mimeType.includes("ms-powerpoint");
         if (isPPT) {
-            responseHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+            responseHeaders.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
         } else {
             responseHeaders.set("Cache-Control", "no-store, no-cache, must-revalidate");
         }
