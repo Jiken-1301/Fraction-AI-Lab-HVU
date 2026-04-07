@@ -93,8 +93,8 @@ export default function TroChoiDetailPage() {
         );
     }
 
-    // Dùng Office Online viewer với direct Drive URL (nhanh, giữ đúng layout)
-    const presentationUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${game.driveId}`)}&wdAr=1.7777777777777777`;
+    // Dùng Google Drive preview (file đã public, nhanh, đáng tin cậy)
+    const presentationUrl = `https://drive.google.com/file/d/${game.driveId}/preview`;
 
     return (
         <div className="h-screen flex flex-col overflow-hidden bg-black">
